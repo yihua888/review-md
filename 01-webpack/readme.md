@@ -319,15 +319,11 @@ rules:[
 **url-loader(**url-loader和file-loader的工作方式是相似的，但是可以将较小的文件，转成base64的URI**)**
 
 - npm install url-loader -D
-
 - 但是开发中我们往往是小的图片需要转换，但是大的图片直接使用图片即可
-
-- - 这是因为小的图片转换base64之后可以和页面一起被请求，减少不必要的请求过程；
+  - 这是因为小的图片转换base64之后可以和页面一起被请求，减少不必要的请求过程；
   - 而大的图片也进行转换，反而会影响页面的请求速度；
-
 - 如何可以限制哪些大小的图片转换和不转换
-
-- - url-loader有一个options属性limit，可以用于设置转换的限制
+- url-loader有一个options属性limit，可以用于设置转换的限制
 
 ```js
 {
@@ -368,10 +364,8 @@ rules:[
 #### 3.4.2 使用babel-loader
 
 - 除了可以使用TypeScript Compiler来编译TypeScript之外，我们也可以使用Babel
-
-- - Babel是有对TypeScript进行支持；
+  - Babel是有对TypeScript进行支持；
   - 我们可以使用插件： @babel/tranform-typescript；但是更推荐直接使用preset：@babel/preset-typescript
-
 - 我们来安装@babel/preset-typescript：npm install @babel/preset-typescript -D
 
 ```js
@@ -399,25 +393,27 @@ rules:[
 
 - 使用ts-loader
 
-- - 来直接编译TypeScript，那么只能将ts转换成js；
-  - 如果我们还希望在这个过程中添加对应的polyfill，那么ts-loader是无能为力的；
+    - 来直接编译TypeScript，那么只能将ts转换成js；
+    - 如果我们还希望在这个过程中添加对应的polyfill，那么ts-loader是无能为力的；
 
 - 使用babel-loader
 
-- - 直接编译TypeScript，也可以将ts转换成js，并且可以实现polyfill的功能；
-  - 但是babel-loader在编译的过程中，不会对类型错误进行检测；
+    - 直接编译TypeScript，也可以将ts转换成js，并且可以实现polyfill的功能；
+    - 但是babel-loader在编译的过程中，不会对类型错误进行检测；
 
 - 如何可以使用tsc来进行类型的检查呢？
 
-- - 在scripts中添加了两个脚本，用于类型检查；
+    - 在scripts中添加了两个脚本，用于类型检查；
 
-- ```json
-    "scripts": {
+    ```js
+    "scripts": {
         "build": "webpack --config webpack.config.js",
         "type-check": "tsc --noEmit",
         "type-check-watch": "tsc --noEmit --watch"
       },
-  ```
+    ```
+
+    
 
 ### 3.5 vue的加载
 
@@ -481,14 +477,10 @@ plugins: [
 安装：npm install copy-webpack-plugin 。接下来配置CopyWebpackPlugin即可:
 
 - 复制的规则在patterns中设置
-
 - from：设置从哪一个源中开始复制
-
 - to：复制到的位置，可以省略，会默认复制到打包的目录下
-
 - globOptions：设置一些额外的选项，其中可以编写需要忽略的文件
-
-- - .DS_Store：mac目录下回自动生成的一个文件
+  - .DS_Store：mac目录下回自动生成的一个文件
   - index.html：也不需要复制，因为我们已经通过HtmlWebpackPlugin完成了index.html的生成。
 
 ```js
@@ -543,32 +535,21 @@ plugins: [
 ### 5.1 Browserslist编写规则
 
 - **defaults：Browserslist的默认浏览器（> 0.5%, last 2 versions, Firefox ESR, not dead）**
-
--  **5%：通过全局使用情况统计信息选择的浏览器版本。 >=，<和<=工作过。**
-
-- - 5% in US：使用美国使用情况统计信息。它接受两个字母的国家/地区代码。
+- **5%：通过全局使用情况统计信息选择的浏览器版本。 >=，<和<=工作过。**
+  - 5% in US：使用美国使用情况统计信息。它接受两个字母的国家/地区代码。
   - \> 5% in alt-AS：使用亚洲地区使用情况统计信息。有关所有区域代码的列表，请参见caniuse-lite/data/regions
   - \> 5% in my stats：使用自定义用法数据。
   - \> 5% in browserslist-config-mycompany stats：使用 来自的自定义使用情况数据browserslist-config-mycompany/browserslist-stats.json。 p cover 99.5%：提供覆盖率的最受欢迎的浏览器。
   - cover 99.5% in US：与上述相同，但国家/地区代码由两个字母组成。
   - cover 99.5% in my stats：使用自定义用法数据。
-
 - **dead：24个月内没有官方支持或更新的浏览器。现在是IE 10，IE_Mob 11，BlackBerry 10，BlackBerry 7， Samsung 4和OperaMobile 12.1**
-
 - l**ast 2 versions：每个浏览器的最后2个版本。**
-
 - node 10和node 10.4：选择最新的Node.js10.x.x 或10.4.x版本。
-
 - iOS 7：直接使用iOS浏览器版本7。
-
 - extends browserslist-config-mycompany：从browserslist-config-mycompanynpm包中查询 。
-
 - supports es6-module：支持特定功能的浏览器。 es6-module这是“我可以使用” 页面feat的URL上的参数。有关所有可用功能的列表，请参见 。caniuselite/data/features
-
 - browserslist config：在Browserslist配置中定义的浏览器。在差异服务中很有用，可用于修改用户的配置，例如 browserslist config and supports es6-module。
-
 - since 2015或last 2 years：自2015年以来发布的所有版本（since 2015-03以及since 2015-03-10）。
-
 - unreleased versions或unreleased Chrome versions：Alpha和Beta版本。
 
 ### 5.2 **配置browserslist的两种方式** 
@@ -1040,18 +1021,14 @@ __webpack_require__('./src/index.js')
 ### 8.1 认识source-map
 
 - 我们的代码通常运行在浏览器上时，是通过打包压缩的
-
-- - 真实跑在浏览器上的代码，和我们编写的代码其实是有差异的
+  - 真实跑在浏览器上的代码，和我们编写的代码其实是有差异的
   - ES6的代码可能被转换成ES5
   - 对应的代码行号、列号在经过编译后肯定会不一致
   - 代码进行丑化压缩时，会将编码名称等修改
   - 我们使用了TypeScript等方式编写的代码，最终转换成JavaScript
-
 - 但是，当代码报错需要调试时（debug），调试转换后的代码是很困难的
-
 - 如何可以调试这种转换后不一致的代码呢？答案就是source-map
-
-- - source-map是从已转换的代码，映射到原始的源文件
+  - source-map是从已转换的代码，映射到原始的源文件
   - 使浏览器可以重构原始源并在调试器中显示重建的原始源
 
 ### 8.2 如何使用source-map
@@ -1067,7 +1044,7 @@ __webpack_require__('./src/index.js')
 浏览器会根据我们的注释，查找响应的source-map，并且根据source-map还原我们的代码，方便进行调试
 在Chrome中，我们可以按照如下的方式打开source-map,默认是打开的（浏览器小齿轮设置）
 
-![](/readme-img/8_2_source.png)
+![](./readme-img/8_2_source.png)
 
 **分析source-map**
 
@@ -1086,37 +1063,23 @@ __webpack_require__('./src/index.js')
 下面几个值不会生成source-map
 
 - false：不使用source-map，也就是没有任何和source-map相关的内容
-
 - none：production模式下的默认值，不生成source-map。
-
 - eval：development模式下的默认值，不生成source-map
-
-- - 但是它会在eval执行的代码中，添加 //# sourceURL=；
+  - 但是它会在eval执行的代码中，添加 //# sourceURL=；
   - 它会被浏览器在执行时解析，并且在调试面板中生成对应的一些文件目录，方便我们调试代码；
-
 - source-map值：生成一个独立的source-map文件，并且在bundle文件中有一个注释，指向source-map文件；
-
 - eval-source-map：会生成sourcemap，但是source-map是以DataUrl添加到eval函数的后面
-
 - inline-source-map：会生成sourcemap，但是source-map是以DataUrl添加到bundle文件的后面
-
 - cheap-source-map
-
-- - 会生成sourcemap，但是会更加高效一些（cheap低开销），因为它没有生成列映射（Column Mapping）
+  - 会生成sourcemap，但是会更加高效一些（cheap低开销），因为它没有生成列映射（Column Mapping）
   - 因为在开发中，我们只需要行信息通常就可以定位到错误了
-
 - cheap-module-source-map值
-
-- - 会生成sourcemap，类似于cheap-source-map，但是对源自loader的sourcemap处理会更好。
-
+- 会生成sourcemap，类似于cheap-source-map，但是对源自loader的sourcemap处理会更好。
 - hidden-source-map
-
-- - 会生成sourcemap，但是不会对source-map文件进行引用
+  - 会生成sourcemap，但是不会对source-map文件进行引用
   - 相当于删除了打包文件中对sourcemap的引用注释；
-
 - nosources-source-map
-
-- - 会生成sourcemap，但是生成的sourcemap只有错误信息的提示，不会生成源代码文件；
+- 会生成sourcemap，但是生成的sourcemap只有错误信息的提示，不会生成源代码文件；
 
 **多个值的组合**
 
@@ -1142,19 +1105,19 @@ __webpack_require__('./src/index.js')
 
 - 如果我们希望在命令行尝试使用babel，需要安装如下库
 
-- - @babel/core：babel的核心代码，必须安装；
+  - @babel/core：babel的核心代码，必须安装；
   - @babel/cli：可以让我们在命令行使用babel；
 
-- ```
+  ```
   npm install @babel/cli @babel/core
   ```
 
 - 使用babel来处理我们的源代码
 
-- - src：是源文件的目录；
+  - src：是源文件的目录；
   - --out-dir：指定要输出的文件夹dist；
 
-- ```
+  ```
   npx babel src --out-dir dist
   ```
 
@@ -1187,26 +1150,21 @@ __webpack_require__('./src/index.js')
 ### 9.4 babel的底层原理
 
 - babel是如何做到将我们的一段代码（ES6、TypeScript、React）转成另外一段代码（ES5）的呢
-
-- - 从一种源代码（原生语言）转换成另一种源代码（目标语言），这是什么的工作呢？
+- 从一种源代码（原生语言）转换成另一种源代码（目标语言），这是什么的工作呢？
   - 就是编译器，事实上我们可以将babel看成就是一个编译器。
   - Babel编译器的作用就是将我们的源代码，转换成浏览器可以直接识别的另外一段源代码
-
 - Babel也拥有编译器的工作流程
-
-- - 解析阶段（Parsing）
+  - 解析阶段（Parsing）
   - 转换阶段（Transformation）
   - 生成阶段（Code Generation）
 
-![](/readme-img/9_4_babel.png)
+![](./readme-img/9_4_babel.png)
 
 ### 9.5 babel-loader
 
 - 在实际开发中，我们通常会在构建工具中通过配置babel来对其进行使用的，比如在webpack中
 
-- 那么我们就需要去安装相关的依赖：
-
-- - npm install babel-loader @babel/core
+- 那么我们就需要去安装相关的依赖：npm install babel-loader @babel/core
 
 - 我们可以设置一个规则，在加载js文件时，使用我们的babel：
 
@@ -1287,13 +1245,10 @@ use:{
 ### 9.10  babel的配置文件
 
 - babel配置文件的两种方式
-
-- - babel.config.json（或者.js，.cjs，.mjs）文件；
+  - babel.config.json（或者.js，.cjs，.mjs）文件；
   - .babelrc.json（或者.babelrc，.js，.cjs，.mjs）文件
-
 - 它们两个有什么区别呢？目前很多的项目都采用了多包管理的方式（babel本身、element-plus、umi等）；
-
-- - .babelrc.json：早期使用较多的配置方式，但是对于配置Monorepos项目是比较麻烦的
+  - .babelrc.json：早期使用较多的配置方式，但是对于配置Monorepos项目是比较麻烦的
   - babel.config.json（babel7）：可以直接作用于Monorepos项目的子包，更加推荐
 
 ### 9.11 polyfill
@@ -1320,15 +1275,11 @@ use:{
 我们需要在babel.config.js文件中进行配置，给preset-env配置一些属性
 
 - useBuiltIns：设置以什么样的方式来使用polyfill；
-
-- - 第一个值：false
-
-  - - 打包后的文件不使用polyfill来进行适配；
-    - 并且这个时候是不需要设置corejs属性的；
-
+  - 第一个值：false
+  - 打包后的文件不使用polyfill来进行适配；
+  - 并且这个时候是不需要设置corejs属性的；
   - 第二个值：usage
-
-  - - 会根据源代码中出现的语言特性，自动检测所需要的polyfill；
+    - 会根据源代码中出现的语言特性，自动检测所需要的polyfill；
     - 这样可以确保最终包里的polyfill数量的最小化，打包的包相对会小一些
     - 可以设置corejs属性来确定使用的corejs的版本；
 
@@ -1348,13 +1299,13 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 ```
 
-- - 第三个值：entry
+- 第三个值：entry
 
-  - - 如果我们依赖的某一个库本身使用了某些polyfill的特性，但是因为我们使用的是usage，所以之后用户浏览器 可能会报错；所以，如果你担心出现这种情况，可以使用 entry；
-    - 并且需要在入口文件中添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime';
-    - 这样做会根据 browserslist 目标导入所有的polyfill，但是对应的包也会变大；
+  - 如果我们依赖的某一个库本身使用了某些polyfill的特性，但是因为我们使用的是usage，所以之后用户浏览器 可能会报错；所以，如果你担心出现这种情况，可以使用 entry；
+  - 并且需要在入口文件中添加 `import 'core-js/stable'; import 'regenerator-runtime/runtime';
+  - 这样做会根据 browserslist 目标导入所有的polyfill，但是对应的包也会变大；
 
-- ```js
+  ```JS
   //babel.config.js
   presets: [
       ["@babel/preset-env", {
@@ -1368,8 +1319,7 @@ import "regenerator-runtime/runtime";
   ```
 
 - corejs：设置corejs的版本，目前使用较多的是3.x。
-
-- - 另外corejs可以设置是否对提议阶段的特性进行支持；
+  - 另外corejs可以设置是否对提议阶段的特性进行支持；
   - 设置 proposals属性为true即可
 
 ### 9.12 Plugin-transform-runtime
@@ -1396,13 +1346,10 @@ import "regenerator-runtime/runtime";
 ### 9.13 React的jsx支持
 
 - 在我们编写react代码时，react使用的语法是jsx，jsx是可以直接使用babel来转换的
-
 - 对react jsx代码进行处理需要如下的插件
-
-- - @babel/plugin-syntax-jsx
+  - @babel/plugin-syntax-jsx
   - @babel/plugin-transform-react-jsx
   - babel-plugin-transform-react-display-name
-
 - 但是开发中，我们并不需要一个个去安装这些插件，我们依然可以使用preset来配置：npm install @babel/preset-react -D
 
 ```js
@@ -1434,15 +1381,10 @@ presets: [
 默认创建的环境如下
 
 - env：运行的环境，比如是浏览器，并且我们会使用es2021（对应的ecmaVersion是12）的语法
-
 - extends：可以扩展当前的配置，让其继承自其他的配置信息，可以跟字符串或者数组（多个）；
-
 - parserOptions：这里可以指定ESMAScript的版本、sourceType的类型
-
-- - parser：默认情况下是espree（也是一个JS Parser，用于ESLint），但是因为我们需要编译TypeScript，所 以需要指定对应的解释器；
-
+- parser：默认情况下是espree（也是一个JS Parser，用于ESLint），但是因为我们需要编译TypeScript，所 以需要指定对应的解释器；
 - plugins：指定我们用到的插件
-
 - rules：自定义的一些规则；
 
 ### 10.4 ESLint插件使用
@@ -1604,7 +1546,7 @@ plugins: [
 - 通过长连接，可以直接将这两个文件主动发送给客户端（浏览器）；
 - 浏览器拿到两个新的文件后，通过HMR runtime机制，加载这两个文件，并且针对修改的模块进行更新
 
-![](/readme-img/11_5_HMR.png)
+![](./readme-img/11_5_HMR.png)
 
 ### 11.6 output的publicPath 和devServer的publicPath
 
@@ -1667,16 +1609,12 @@ host设置主机地址
 localhost 和 0.0.0.0 的区别
 
 - localhost：本质上是一个域名，通常情况下会被解析成127.0.0.1
-
 - 127.0.0.1：回环地址(Loop Back Address)，表达的意思其实是我们主机自己发出去的包，直接被自己接收
-
-- - 正常的数据库包经常 应用层 - 传输层 - 网络层 - 数据链路层 - 物理层
+  - 正常的数据库包经常 应用层 - 传输层 - 网络层 - 数据链路层 - 物理层
   - 而回环地址，是在网络层直接就被获取到了，是不会经常数据链路层和物理层的;
   - 比如我们监听 127.0.0.1时，在同一个网段下的主机中，通过ip地址是不能访问的
-
 - 0.0.0.0：监听IPV4上所有的地址，再根据端口找到不同的应用程序
-
-- - 比如我们监听 0.0.0.0时，在同一个网段下的主机中，通过ip地址是可以访问的
+- 比如我们监听 0.0.0.0时，在同一个网段下的主机中，通过ip地址是可以访问的
 
 port设置监听的端口，默认情况下是8080
 
@@ -1706,13 +1644,10 @@ compress是否为静态文件开启gzip compression
 ### 11.9 Proxy代理
 
 - proxy是我们开发中非常常用的一个配置选项，它的目的设置代理来解决跨域访问的问题
-
-- - 比如我们的一个api请求是 http://localhost:8888，但是本地启动服务器的域名是 http://localhost:8000，这 个时候发送网络请求就会出现跨域的问题；
+  - 比如我们的一个api请求是 http://localhost:8888，但是本地启动服务器的域名是 http://localhost:8000，这 个时候发送网络请求就会出现跨域的问题；
   - 那么我们可以将请求先发送到一个代理服务器，代理服务器和API服务器没有跨域的问题，就可以解决我们的 跨域问题了
-
 - 我们可以进行如下的设置
-
-- - target：表示的是代理到的目标地址，比如 /api-yihua/test会被代理到 http://localhost:8888/api-hy/yihua/test；
+  - target：表示的是代理到的目标地址，比如 /api-yihua/test会被代理到 http://localhost:8888/api-hy/yihua/test；
   - pathRewrite：默认情况下，我们的 /api-yihua 也会被写入到URL中，如果希望删除，可以使用pathRewrite
   - secure：默认情况下不接收转发到https的服务器上，如果希望支持，可以设置为false；
   - changeOrigin：它表示是否更新代理后请求的headers中host地址；
@@ -1771,13 +1706,10 @@ webpack能解析三种文件路径
 确实文件还是文件夹
 
 - 如果是一个文件
-
-- - 如果文件具有扩展名，则直接打包文件
+  - 如果文件具有扩展名，则直接打包文件
   - 否则，将使用 resolve.extensions选项作为文件扩展名解析
-
 - 如果是一个文件夹
-
-- - 会在文件夹中根据 resolve.mainFiles配置选项中指定的文件顺序查找
+  - 会在文件夹中根据 resolve.mainFiles配置选项中指定的文件顺序查找
   - resolve.mainFiles的默认值是 ['index']；
   - 再根据 resolve.extensions来解析扩展名；
 
@@ -2132,14 +2064,11 @@ import(/* webpackChunkName: "foo" */"./foo").then(res => {
 optimization.chunkIds配置用于告知webpack模块的id采用什么算法生成。
 
 - 有三个比较常见的值：
-
-- - natural：按照数字的顺序使用id；
+  - natural：按照数字的顺序使用id；
   - named：development下的默认值，一个可读的名称的id；
   - deterministic：确定性的，在不同的编译中不变的短数字id
-
 - 最佳实践
-
-- - 开发过程中，我们推荐使用named；
+  - 开发过程中，我们推荐使用named；
   - 打包过程中，我们推荐使用deterministic；
 
 ```js
@@ -2188,31 +2117,23 @@ button.addEventListener("click", () => {
 webpack v4.6.0+ 增加了对预获取和预加载的支持。
 
 - 在声明 import 时，使用下面这些内置指令，来告知浏览器：
-
-- - prefetch(预获取)：将来某些导航下可能需要的资源
+  - prefetch(预获取)：将来某些导航下可能需要的资源
   - preload(预加载)：当前导航下可能需要资源
-
 - 与 prefetch 指令相比，preload 指令有许多不同之处
-
-- - preload chunk 会在父 chunk 加载时，以并行方式开始加载。prefetch chunk 会在父 chunk 加载结束后开 始加载
+  - preload chunk 会在父 chunk 加载时，以并行方式开始加载。prefetch chunk 会在父 chunk 加载结束后开 始加载
   - preload chunk 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载。
   - preload chunk 会在父 chunk 中立即请求，用于当下时刻。prefetch chunk 会用于未来的某个时刻。
 
 ### 16.8 optimization. runtimeChunk配置
 
 - 配置runtime相关的代码是否抽取到一个单独的chunk中
-
-- - runtime相关的代码指的是在运行环境中，对模块进行解析、加载、模块信息相关的代码
+  - runtime相关的代码指的是在运行环境中，对模块进行解析、加载、模块信息相关的代码
   - 比如我们的component、bar两个通过import函数相关的代码加载，就是通过runtime代码完成的
-
 - 抽离出来后，有利于浏览器缓存的策略
-
-- - 比如我们修改了业务代码（main），那么runtime和component、bar的chunk是不需要重新加载的；
+  - 比如我们修改了业务代码（main），那么runtime和component、bar的chunk是不需要重新加载的；
   - 比如我们修改了component、bar的代码，那么main中的代码是不需要重新加载的
-
 - 设置的值
-
-- - true/multiple：针对每个入口打包一个runtime文件
+  - true/multiple：针对每个入口打包一个runtime文件
   - single：打包一个runtime文件；
   - 对象：name属性决定runtimeChunk的名称
 
@@ -2245,17 +2166,12 @@ CDN称之为内容分发网络
 **第三方库的CDN服务器**
 
 - 通常一些比较出名的开源框架都会将打包后的源码放到一些比较出名的、免费的CDN服务器上：
-
-- - 国际上使用比较多的是unpkg、JSDelivr、cdnjs
+  - 国际上使用比较多的是unpkg、JSDelivr、cdnjs
   - 国内也有一个比较好用的CDN是bootcdn；
-
 - 在项目中，我们如何去引入这些CDN呢
-
-- - 第一，在打包的时候我们不再需要对类似于lodash或者dayjs这些库进行打包
+  - 第一，在打包的时候我们不再需要对类似于lodash或者dayjs这些库进行打包
   - 第二，在html模块中，我们需要自己加入对应的CDN服务器地址；
-
 - 第一步，我们可以通过webpack配置，来排除一些库的打包
-
 - 第二步，在html模块中，加入CDN服务器地址
 
 ```js
@@ -2282,13 +2198,9 @@ CDN称之为内容分发网络
 **Shimming预支全局变量**
 
 - 目前我们的lodash、dayjs都使用了CDN进行引入，所以相当于在全局是可以使用_和dayjs的
-
-- - 假如一个文件中我们使用了axios，但是没有对它进行引入，那么代码是会报错的
-
+- 假如一个文件中我们使用了axios，但是没有对它进行引入，那么代码是会报错的
 - 我们可以通过使用ProvidePlugin来实现shimming的效果：
-
 - ProvidePlugin能够帮助我们在每个模块中，通过一个变量来获取一个package
-
 - 另外ProvidePlugin是webpack默认的一个插件，所以不需要专门导入
 
 ```js
@@ -2306,19 +2218,14 @@ CDN称之为内容分发网络
 在我们给打包的文件进行命名的时候，会使用placeholder，placeholder中有几个属性比较相似。hash、chunkhash、contenthash。hash本身是通过MD4的散列函数处理后，生成一个128位的hash值（32个十六进制）；
 
 - hash值的生成和整个项目有关系
-
-- - 比如我们现在有两个入口index.js和main.js；
+  - 比如我们现在有两个入口index.js和main.js；
   - 它们分别会输出到不同的bundle文件中，并且在文件名称中我们有使用hash
   - 这个时候，如果修改了index.js文件中的内容，那么hash会发生变化；
   - 那就意味着两个文件的名称都会发生变化；
-
 - chunkhash可以有效的解决上面的问题，它会根据不同的入口进行借来解析来生成hash值：
-
-- - 比如我们修改了index.js，那么main.js的chunkhash是不会发生改变的；
-
+- 比如我们修改了index.js，那么main.js的chunkhash是不会发生改变的；
 - contenthash表示生成的文件hash名称，只和内容有关系：
-
-- - 比如我们的index.js，引入了一个style.css，style.css有被抽取到一个独立的css文件中
+  - 比如我们的index.js，引入了一个style.css，style.css有被抽取到一个独立的css文件中
   - 这个css文件在命名时，如果我们使用的是chunkhash
   - 那么当index.js文件的内容发生变化时，css文件的命名也会发生变化
   - 这个时候我们可以使用contenthash；
@@ -2373,20 +2280,14 @@ DLL库的使用分为两步:
 #### 18.2.1 usedExports
 
 - 将mode设置为development模式
-
-- - 为了可以看到 usedExports带来的效果，我们需要设置为 development 模式
+  - 为了可以看到 usedExports带来的效果，我们需要设置为 development 模式
   - 因为在 production 模式下，webpack默认的一些优化会带来很大的影响。
-
 - 设置usedExports为true和false对比打包后的代码：
-
-- - 在usedExports设置为true时，会有一段注释：unused harmony export mul；
+  - 在usedExports设置为true时，会有一段注释：unused harmony export mul；
   - 这段注释的意义是什么呢？告知Terser在优化时，可以删除掉这段代码；
-
 - 这个时候，我们将 minimize设置true：
-
-- - usedExports设置为false时，mul函数（没有被使用的函数）没有被移除掉；
+  - usedExports设置为false时，mul函数（没有被使用的函数）没有被移除掉；
   - usedExports设置为true时，mul函数（没有被使用的函数）有被移除掉；
-
 - 所以，usedExports实现Tree Shaking是结合Terser来完成的
 
 ```js
@@ -2679,7 +2580,7 @@ new BundleAnalyzerPlugin()
 
 ### 21.3 webpack的启动流程
 
-![](/readme-img/21-3-1-webpack.png)
+![](./readme-img/21-3-1-webpack.png)
 
 **自己启动webpack不使用webpack-cli**
 
@@ -2707,22 +2608,20 @@ compiler.run((err, stats) => {
 Compiler和Compilation的区别？
 
 - Compiler：在webpack构建的之初就会创建的一个对象, 并且在webpack的整个生命周期都会存在(before - run - beforeCompiler - compile - make - finishMake - afterCompiler - done)。只要是做webpack的编译, 都会先创建一个Compiler
-
 - Compilation：Compilation是到准备编译模块(比如main.js), 才会创建Compilation对象。主要是存在于 compile(之后) - make(之前) 阶段主要使用的对象
-
-- - watch -> 源代码发生改变就需要重新编译模块
-  -  Compiler可以继续使用(如果我修改webpack的配置, 那么需要重新执行run run build)
+  - watch -> 源代码发生改变就需要重新编译模块
+  - Compiler可以继续使用(如果我修改webpack的配置, 那么需要重新执行run run build)
   - Compilation需要创建一个新的Compilation对象
 
-![](/readme-img/21-3-2-webpack.png)
+![](./readme-img/21-3-2-webpack.png)
 
-![](/readme-img/21-3-3-webpack.png)
+![](./readme-img/21-3-3-webpack.png)
 
-![](/readme-img/21-3-4-webpack.png)
+![](./readme-img/21-3-4-webpack.png)
 
-![](/readme-img/21-3-5-webpack.png)
+![](./readme-img/21-3-5-webpack.png)
 
-![](/readme-img/21-3-6-webpack.png)
+![](./readme-img/21-3-6-webpack.png)
 
 ## 第二十二章、自定义loader
 
@@ -3002,18 +2901,15 @@ webpack有两个非常重要的类：Compiler和Compilation
 
 ### 23.2  Tapable有哪些Hook呢
 
-![](/readme-img/23-2-tapable.png)
+![](./readme-img/23-2-tapable.png)
 
  **分类:**
 
 - 同步和异步的
-
-- - 以sync开头的，是同步的Hook
+  - 以sync开头的，是同步的Hook
   - 以async开头的，两个事件处理回调，不会等待上一次处理回调结束后再执行下一次回调
-
 - 其他的类别
-
-- - bail：当有返回值时，就不会执行后续的事件触发了
+  - bail：当有返回值时，就不会执行后续的事件触发了
   - Loop：当返回值为true，就会反复执行该事件，当返回值为undefined或者不返回内容，就退出事件
   - Waterfall：当返回值不为undefined时，会将这次返回的结果作为下次事件的第一个参数；
   - Parallel：并行，会同时执行次事件处理回调结束，才执行下一次事件处理回调
