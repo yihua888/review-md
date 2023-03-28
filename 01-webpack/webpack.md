@@ -2913,7 +2913,7 @@ webpack有两个非常重要的类：Compiler和Compilation
   - Loop：当返回值为true，就会反复执行该事件，当返回值为undefined或者不返回内容，就退出事件
   - Waterfall：当返回值不为undefined时，会将这次返回的结果作为下次事件的第一个参数；
   - Parallel：并行，会同时执行次事件处理回调结束，才执行下一次事件处理回调
-  - Series：串行，会等待上一是异步的Hook
+  - Series：串行，会等待上一个异步的Hook
 
 ```js
 const { SyncHook, SyncBailHook, SyncLoopHook, SyncWaterfallHook } = require("tapable");
