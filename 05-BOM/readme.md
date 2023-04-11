@@ -1055,3 +1055,429 @@ server.listen(3000, () => console.log('Server is listening port 3000.'));
 Blob（Binary Large Object）对象表示一个不可变、原始数据的类文件对象。它的数据可以按文本或二进制的格式进行读取，也可以转换成 ReadableStream 来用于数据操作。
 
 Blob 表示的不一定是 JavaScript 原生格式的数据。File 接口基于 Blob，继承了 `blob` 的功能并将其扩展使其支持用户系统上的文件。
+
+#### 4.2.1 基本用法
+
+可以通过 Blob 的构造函数创建 Blob 对象：
+
+```js
+const blob = new Blob(data [, options]);
+```
+
+- `data`：类数组类型，数组中的每一项连接起来构成 Blob 对象的数据，数组中的每项元素可以是 `ArrayBuffer`、`ArrayBufferView`、`Blob`、`DOMString`
+- `options`：可选项，字典格式类型，可以指定如下两个属性
+  - `type`：默认值为空字符串 `''`，它代表了将会被放入到 Blob 中的数组内容的 MIME 类型
+  - `endings`：默认值为 `transparent`，用于指定包含行结束符 `\n` 的字符串如何被写入。 它是以下两个值中的一个:
+    - `native`，表示行结束符会被更改为适合宿主操作系统文件系统的换行符
+    - `transparent`，表示会保持 Blob 中保存的结束符不变
+
+#### 4.2.2 属性和方法
+
+| 属性        | 说明                                                    |
+| ----------- | ------------------------------------------------------- |
+| `Blob.size` | （只读）Blob 对象的大小（单位：字节）                   |
+| `Blob.type` | （只读）Blob 对象的 MIME 类型，如果是未知，则是空字符串 |
+
+| 方法                                          | 说明                                                       |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| `Blob.slice([start [, end [, contentType]]])` | 返回源 Blob 对象指定范围的新 Blob 对象                     |
+| `Blob.stream()`                               | 返回能读取 Blob 对象内容的 ReadableStream                  |
+| `Blob.text()`                                 | 返回 Promise 且包含 Blob 所有内容的 UTF-8 格式的 USVString |
+| `Blob.arrayBuffer()`                          | 返回 Promise 且包含 Blob 所有内容二进制格式的 ArrayBuffer  |
+
+#### 4.2.3 与 ArrayBuffer 的关系
+
+相同点：Blob 和 ArrayBuffer 都是二进制的容器
+
+- ArrayBuffer：ArrayBuffer 更加底层，就是一段纯粹的内存上的二进制数据，我们可以对其任何一个字节进行单独的修改，也可以根据我们的需要以我们制定的形式读取指定范围的数据
+- Blob：Blob 就是将一段二进制数据做了一个封装，我们拿到的就是一个整体，可以看到它的整体属性大小、类型；也可以对其分割，但不能了解到它的细节
+
+联系：Blob 可以接受一个 ArrayBuffer 作为参数生成一个 Blob 对象，此行为就相当于对 ArrayBuffer 数据做一个封装，之后就是以整体的形式展现了
+
+应用上的区别：由于 ArrayBuffer 和 Blob 的特性，Blob 作为一个整体文件，适合用于传输；而只有需要关注细节（比如修改某段数据时），才需要用到 ArrayBuffer
+
+#### 4.2.4 应用示例
+
+- 文件下载：通过 `URL.createObjectURL(blob)` 生成 Blob URL，赋给 `a.download` 属性
+- 图片显示：通过 `URL.createObjectURL(blob)` 生成 Blob URL，赋给 `img.src` 属性
+- 资源分段上传：通过 `Blob.slice` 可以分割二进制数据为子 Blob 上传
+- 本地读取文件：`FileReader` 的 API 可以将 Blob 或 File 转化为文本/ArrayBuffer/Data URL 等类型
+
+```js
+const data1 = 'a';
+const data2 = 'b';
+const data3 = '<div style="color: red;">This is a blob</div>';
+const data4 = { name: 'abc' };
+
+const blob1 = new Blob([data1]);
+const blob2 = new Blob([data1, data2]);
+const blob3 = new Blob([data3]);
+const blob4 = new Blob([JSON.stringify(data4)]);
+const blob5 = new Blob([data4]);
+const blob6 = new Blob([data3, data4]);
+
+console.log(blob1);
+// Blob { size: 1, type: "" }
+console.log(blob2);
+// Blob { size: 2, type: "" }
+console.log(blob3);
+// Blob { size: 44, type: "" }
+console.log(blob4);
+// Blob { size: 14, type: "" }
+console.log(blob5);
+// Blob { size: 15, type: "" }
+console.log(blob6);
+// Blob { size: 59, type: "" }
+```
+
+实际上，当使用普通对象创建 Blob 对象时，相当于调用了普通对象的 `toString` 方法得到字符串数据，然后再创建 Blob 对象。
+
+#### 4.2.5 Blob URL
+
+Blob URL 是 Blob 协议的 URL，格式如下：
+
+```
+blob:http://xxx
+```
+
+和冗长的 Base64 格式的 Data URL 相比，Blob URL 的长度显然不能够存储足够的信息，这也就意味着它只是类似于一个浏览器内部的 **引用**。
+
+常见的应用场景：
+
+- 作为文件的下载地址
+- 作为图片资源地址
+- 本地视频文件上传前播放器的预览地址
+
+### 4.3  File API
+
+File 对象接口提供有关文件的信息，并允许网页中的 JavaScript 访问起内容。
+
+通常情况下，File 对象是来自：
+
+- 用户在一个 `<input type="file">` 元素上选择文件后返回的 [FileList](https://tsejx.github.io/javascript-guidebook/browser-object-model/binary-data-and-files/file-list) 对象
+- 拖拽中生成的 DataTransfer 对象
+- HTMLCanvasElement 上的 `mozGetAsFile()` API
+
+在 Gecko 中，特权代码可以创建代表任何本地文件的 File 对象，而无需用户交互。
+
+File 对象是特殊类型的 Blob 对象，且可以用在任意的 Blob 类型的 `context` 中。比如说，FileReader，`URL.createObjectURL()`，`createImageBitmap()` 及 `XMLHttpRequest.send()` 都能处理 Blob 和 File。
+
+#### 4.3.1 基本用法
+
+通过 `new` 操作符构建文件对象 File。
+
+```js
+const file = new File();
+```
+
+#### 4.3.2 属性和方法
+
+File 对象也继承了 Blob 对象的属性。以下属性均为 **只读** 属性，不可修改。
+
+| 属性                        | 说明                                                         |
+| --------------------------- | ------------------------------------------------------------ |
+| `File.lastModified`         | 当前引用文件 **最后的修改时间**，为自 1970 年 1 月 1 日 0 时 0 分以来的毫秒数 |
+| `File.lastModifiedDate` 🗑   | 当前引用文件 **最后的修改时间**，为 Date 对象                |
+| `File.name`                 | 当前引用文件的 **名称**                                      |
+| `File.size`                 | 当前引用文件的 **大小**                                      |
+| `File.webkitRelativePath` ⚠️ | 当前引用文件的 **路径或 URL**                                |
+| `File.type`                 | 当前引用文件的多用途互联网邮件 **扩展类型**                  |
+
+File 对象接口没有定义任何方法，但是继承了 Blob 对象接口的方法。
+
+#### 4.3.3 注意事项
+
+- 下面的非标准的属性及方法在 Gecko 7（Firefox 7.0 / Thunderbird 7.0 / SeaMonkey 2.4)）里就被移除：
+  - `File.fileName`
+  - `File.fileSize`
+  - `File.getAsBinary()`
+  - `File.getAsDataURL()`
+  - `File.getAsText`
+
+应该使用 `File.name` ，`Blob.size`，和 `FileReader` 的方法来代替。
+
+#### 4.3.4 FileList API
+
+FileList 是 File对象的类数组序列（考虑 `<input type='file' multiple>` 或者从桌面拖动目录或文件），通常来自于一个 HTML input 元素的 `files` 属性，你可以通过这个对象访问到用户所选择的文件。该类型的对象还能是来自用户的拖放操作。
+
+### 4.4 FileReader API
+
+FileReader 对象允许 Web 应用程序 **异步读取** 存储在用户计算机上的文件（或原始数据缓冲区）的内容。
+
+FileReader API 接口提供了一个异步 API，使用该 API 可以在浏览器主线程中异步访问文件系统，读取文件中的数据。
+
+其中 File 对象可以是：
+
+- 来自用户在一个 `<input>` 元素上选择文件后返回的 FileList 对象
+- 也可以来自拖放操作生成的 DataTransfer 对象
+- 还可以是来自一个 HTMLCanvasElement 上执行 `mozGetAsFile()` 方法后返回结果
+
+#### 4.4.1 基本用法
+
+通过 `new` 操作符构造 FileReader 对象。
+
+```js
+const fileReader = new FileReader();
+```
+
+#### 4.4.2 属性和方法
+
+以下属性均为只读属性，不可更改。
+
+| 属性                    | 说明                                                         |
+| ----------------------- | ------------------------------------------------------------ |
+| `FileReader.error`      | DOMException 类型，表示在读取文件时发生的错误                |
+| `FileReader.readyState` | 表示 FileReader **状态码**（`EMPTY=0` 还没有加载任何数据；`LOADING=1` 数据正在被加载；`DONE=2` 已完成全部的读取请求） |
+| `FileReader.result`     | 文件的内容，该属性仅在 **读取操作完成后** 才有效，数据的格式取决于使用哪个方法来启动读取操作。 |
+
+对 FileReader 对象调用其中某一种读取方法后，可使用以下事件处理方式跟踪其读取进度。
+
+| 事件                     | 说明                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| `FileReader.onprogress`  | 处理 progress 事件，该事件在 **读取** Blob 时触发。          |
+| `FileReader.onloadstart` | 处理 loadstart 事件，该事件在读取操作 **开始** 时触发。      |
+| `FileReader.onabort`     | 处理 abort 事件，该事件在读取操作 **被中断** 时触发。        |
+| `FileReader.onload`      | 处理 load 事件，该事件在读取操作 **完成** 时触发。           |
+| `FileReader.onloadend`   | 处理 loadend 事件，该事件在读取操作 **结束**（要么成功，要么失败）时触发。 |
+| `FileReader.onerror`     | 处理 error 事件，该事件在读取操作 **发生错误** 时触发。      |
+
+这些方法都是异步读取文件的。无论读取成功或失败，方法并不会返回读取结果，这一结果存储在 `result` 属性中。
+
+| 方法                                       | 说明                                                         |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| `FileReader.abort()`                       | 中止读取操作，在返回时，readyState 属性为 `DONE`。           |
+| `FileReader.readAsText(file [, encoding])` | 开始读取指定的 Blob 中的内容，一旦完成，`result` 属性中将包含一个**字符串**以表示所读取文件的内容 |
+| `FileReader.readAsDataURL(file)`           | 开始读取指定的 Blob 中的内容，一旦完成，`result` 属性中将包含一个 **`data:URL` 格式的字符串**以表示所读取文件的内容 |
+| `FileReader.readAsArrayBuffer()`           | 开始读取指定的 Blob 中的内容，一旦完成，`result` 属性中保存的将是被读取文件的 **ArrayBuffer 数据对象** |
+| `FileReader.readAsBinaryString(file)`      | 开始读取指定 Blob 中的内容，一旦完成，`result` 属性中将包含所读取文件的 **原始二进制数据** |
+
+#### 4.4.3 应用示例
+
+```js
+const reader = new FileReader();
+
+reader.addEventListener('loadend', function() {
+  // reader.result 包含了 TypedArray 格式的 Blob 内容
+});
+
+reader.readAsArrayBuffer(blob);
+
+blob = new Blob(['This is my blob content.'], { type: 'text/plain' });
+// 读取为文本
+reader.readAsText(blob);
+```
+
+#### 4.4.4 FileReaderSync
+
+FileReaderSync 接口允许以 **同步** 的方式读取 **File** 或 **Blob** 对象中的内容。
+
+> 该接口只在 Workers 里可用，因为在主线程里进行同步 I/O 操作可能会阻塞用户界面。
+
+### 4.5 FormData
+
+FormData API 接口提供了一种表示表单数据的键值对，并且将数据通过 `XMLHttpRequest.send` 方法发送出去。
+
+#### 4.5.1 基本用法
+
+```js
+const formData = new FormData(form ? :HTMLFormElement);
+```
+
+| 参数 | 说明                                                         |
+| ---- | ------------------------------------------------------------ |
+| form | （可选）一个 HTML 表单元素，可以包含任何形式的表单控件，包括文件输入框 |
+
+#### 4.5.2 方法
+
+| 属性                    | 说明                                     |
+| ----------------------- | ---------------------------------------- |
+| `FormData.append()`     | 为 FormData 添加新的属性值               |
+| `FormData.set()`        | 设置 FormData 中属性值                   |
+| `FormData.has()`        | 判断 FormData 中是否包含某个键           |
+| `FormData.get()`        | 获取 FormData 中指定键关联的值           |
+| `FormData.getAll(name)` | 获取 FormData 中指定键关联的所有值的数组 |
+| `FormData.delete()`     | 删除 FormData 中指定的键值对             |
+| `FormData.entries()`    | 获取 FormData 中所有键值对               |
+| `FormData.keys()`       | 获取 FormData 中键名组成难过的数组       |
+| `FormData.values()`     | 获取 FormData 中键值组成的数组           |
+
+#### 4.5.3 应用示例
+
+使用已有的表单来初始化一个对象实例。假如现在页面已经有一个表单。
+
+```html
+<form id="file" action="" method="post">
+  <input type="text" name="name" />名字 <input type="password" name="psw" />密码
+  <input type="submit" value="提交" />
+</form>
+```
+
+我们可以使用这个表单元素作为初始化参数，来实例化一个 FormData 对象。
+
+```js
+// 获取页面已有的一个 form 表单
+const form = document.getElementById('file');
+// 用表单来初始化
+const formData = new FormData(form);
+// 我们可以根据 name 来访问表单中的字段
+// 获取名字
+const name = formData.get('name');
+// 获取密码
+const psw = formData.get('psw');
+// 当然也可以在此基础上，添加其他数据
+formData.append('token', 'kshdfiwi3rh');
+```
+
+## 第五章、数据通信API
+
+### 5.1 PostMessage
+
+通常情况下，对于两个不同页面的脚步，只有当执行它们的页面位于具有相同的协议（通常是 HTTPS），端口号（443 HTTPS 的默认值），以及主机（两个页面的模数 `document.domain` 设置为相同的值）时，这两个脚本才能互相通信。`window.postMessage()` 方法提供了一种受控机制来规避此限制，只要正确的使用，这种方法就很安全。
+
+#### 5.1.1 语法
+
+```js
+targetWindow.postMessage(message, targetOrigin [, transfer])
+```
+
+| 参数           | 说明                                                         |
+| -------------- | ------------------------------------------------------------ |
+| `targetWindow` | 通信目标窗口的引用，例如 `iframe` 的 `contentWindow` 属性、执行 `window.open` 返回的窗口对象、或者是命名过或数值索引的 `window.frames`。 |
+| `message`      | 发送到通信目标窗口的数据。它将会被**结构化克隆算法序列化**。这意味着你可以不受什么限制的将数据对象安全的传送给目标窗口而无需自己序列化。 |
+| `targetOrigin` | 通过窗口的 `origin` 属性来指定哪些窗口能接收到消息事件，其值可以是字符串或 URI。在发送消息的时候，如果目标窗口的**协议**、**主机地址**或**端口**这三者的任意一项不匹配 `targetOrigin` 提供的值，那么消息就不会被发送。只有三者完全匹配，消息才会被发送。 |
+| `transfer`     | （可选）与通讯数据同时传递的 Transferable 对象，这些对象的所有权将被转移给消息的接收方，而发送方将不再保留所有权。 |
+
+#### 5.1.2 发送方
+
+当 `window.postMessage()` 调用时，会在所有页面脚本执行完毕后，向目标窗口派发 MessageEvent 消息。
+
+| 属性    | 说明                         |
+| ------- | ---------------------------- |
+| message | 发送消息的类型               |
+| data    | 从其他窗口发送过来的消息对象 |
+| origin  | 发送方窗口的源               |
+| source  | 发送方的窗口对象             |
+
+```js
+const message = 'Hello world!';
+const target = '*';
+const transfer = [];
+
+window.postMessage('hello', target, transfer);
+```
+
+源窗口可以是全局 Window 对象，也可以是以下类型的窗口：
+
+- 文档窗口中的 iframe
+
+  ```js
+  const iframe = document.getElementById('my-iframe');
+  const win = iframe.documentWindow;
+  ```
+
+- JavaScript 打开的弹窗
+
+  ```js
+  const win = window.open();
+  ```
+
+- 当前文档窗口的父窗口
+
+  ```js
+  const win = window.parent;
+  ```
+
+- 打开当前文档的窗口
+
+  ```js
+  const win = window.opener();
+  ```
+
+#### 5.1.3 监听方
+
+一般用于收取发送的消息，`message` 的属性有。
+
+| 属性   | 说明                                           |
+| ------ | ---------------------------------------------- |
+| data   | 从源窗口传递过来的对象                         |
+| origin | 调用 `postMessage` 时消息发送方窗口的 `origin` |
+| source | 对发送消息的窗口对象的引用                     |
+
+```js
+window.addEventListener('message', receiveMessage, false);
+
+function receiveMessage(event) {
+  // For Chrome, the origin property is in the event.originalEvent
+  // object
+  const origin = event.origin || event.originalEvent.origin;
+  if (origin !== 'http://example.org:8080') {
+    return;
+  }
+}
+```
+
+#### 5.1.4 安全性
+
+如果您不希望从其他网站接收 message，请不要为 message 事件添加任何事件侦听器。这是一个完全万无一失的方式来避免安全问题。
+
+如果您确实希望从其他网站接收 message，请始终使用 origin 和 source 属性验证发件人的身份。任何窗口都可以向任何其他窗口发送消息，并且您不能保证未知发件人不会发送恶意消息。但是，验证身份后，您仍然应该始终验证接收到的消息的语法。否则，您信任之发送受信任邮件的网站中的安全漏洞可能会在您的网站中打开跨网站脚本漏洞。
+
+当您使用 postMessage 将数据发送到其他窗口时，始终指定精确的目标 origin，而不是 *。恶意网站可以在您不知情的情况下更改窗口的位置，因此它可以拦截使用 postMessage 发送的数据。
+
+### 5.2 XMLHttpRequest API
+
+使用 XMLHttpRequest（XHR） 对象可以与服务器交互。您可以从 URL 获取数据，而无需让整个的页面刷新。
+
+**Ajax**（Asynchronous JavaScript and XML）是一系列 Web 开发技术的集合，使用很多的 Web 技术在客户端开发异步 Web 应用。利用 Ajax，Web 应用可以异步的发送数据获取数据，而不干扰现有页面的显示和行为。通过解耦数据接口层和展现层，Ajax 允许 Web 页面或者其他扩展的 Web 应用动态的改变数据而不用重新加载整个页面。实现通常选择 JSON 代替 XML，因为更接近 JavaScript。
+
+```unknown
+EventTarget <- XMLHttpRequestEventTarget <- XMLHttpRequest
+```
+
+#### 5.2.1 基本用法
+
+```js
+const xhr = new XMLHttpRequest();
+```
+
+#### 5.2.2 原型属性
+
+此接口继承了 `XMLHttpRequestEventTarget` 和 `EventTarget` 的属性。
+
+| 属性                 | 说明                                                         | 类型                                                         |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `onreadystatechange` | 当 `readyState` 属性发生改变时，设定的回调函数会被调用       | Function                                                     |
+| `readyState`         | （只读） 用于表示请求的五种状态                              | unsigned short                                               |
+| `response`           | （只读） 用于获取整个响应实体，响应体的类型由 `responseType` 来指定 | Blob ArrayBuffer Document JSON String null（请求未完成或失败） |
+| `responseText`       | （只读） 用于获取请求的响应文本                              | DOMString null（请求未完成或失败）                           |
+| `responseType`       | 用于设置该值能够改变响应类型                                 | XMLHttpRequestResponseType                                   |
+| `status`             | （只读）用于获取请求的 **响应状态码**                        | unsigned short                                               |
+| `statusText`         | （只读）用于获取请求的 **响应状态信息**，包含一个状态码和消息文本 | DOMString                                                    |
+| `timeout`            | 用于表示请求 **最大请求时间**（毫秒），若超出该时间，请求会自动终止 | unsigned long                                                |
+| `upload`             | （只读） 用于在 `upload` 上添加一个 **事件监听** 来跟踪上传过程 | XMLHttpRequestUpload                                         |
+| `withCredentials`    | 用于指定跨域 `Access-Control` 请求是否应当带有授权信息，如 Cookie 或授权首部字段 | Boolean                                                      |
+
+##### 5.2.2.1 onreadystatechange
+
+使用示例：
+
+```js
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://developer.mozilla.org/', true);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+    console.log(xhr.responseText);
+  }
+};
+xhr.send();
+```
+
+##### 5.2.2.2 readyState
+
+| 值   | 状态               | 描述                                          |
+| ---- | ------------------ | --------------------------------------------- |
+| 0    | `UNSENT`           | 请求代表被创建，但尚未调用 `open` 方法        |
+| 1    | `OPENED`           | `open` 方法已经被调用                         |
+| 2    | `HEADERS_RECEIVED` | `send` 方法已被调用，并且头部和状态已经可访问 |
+| 3    | `LOADING`          | 下载中（`responseText` 属性已经包含部分数据） |
+| 4    | `DONE`             | 下载操作已完成                                |
