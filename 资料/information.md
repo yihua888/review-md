@@ -4,7 +4,7 @@
 
 - [在线生成透明图标](http://www.ico51.cn/)
 - [代码片段生成器](https://snippet-generator.app/)
-- [图片处理][https://www.iloveimg.com/zh-cn]
+- [图片处理](https://www.iloveimg.com/zh-cn)
 - [pdf处理](https://www.ilovepdf.com/zh-cn)
 - [编码转换](http://www.jsons.cn/utf8/)
 - [菜鸟工具](https://c.runoob.com/)
